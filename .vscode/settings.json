@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "draw.h": "c",
+        "gl.h": "c",
+        "glfw3.h": "c",
+        "glad.h": "c",
+        "math.h": "c",
+        "mmath.h": "c",
+        "cglm.h": "c"
+    }
+}
