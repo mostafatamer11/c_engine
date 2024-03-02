@@ -41,9 +41,6 @@ int main(int argc, char* argv[]) {
 
     createCubeMesh(cubeVertices, cubeTriangles);
 
-    Camera camera;
-    createCamera(&camera, (vec3){0.0f, 0.0f, 3.0f}, (vec3){0.0f, 0.0f, -1.0f}, (vec3){0.0f, 1.0f, 0.0f});
-
     long fragmentShaderSize;
     long vertexShaderSize;
 
@@ -77,68 +74,51 @@ int main(int argc, char* argv[]) {
 
     glUseProgram(shaderProgram);
 
-    GLuint modelViewLoc = glGetUniformLocation(shaderProgram, "modelView");
-    GLuint projectionLoc = glGetUniformLocation(shaderProgram, "projection");
-    GLuint lightPosLoc = glGetUniformLocation(shaderProgram, "lightPos");
-    GLuint viewPosLoc = glGetUniformLocation(shaderProgram, "viewPos");
-    GLuint lightColorLoc = glGetUniformLocation(shaderProgram, "lightColor");
-    GLuint objectColorLoc = glGetUniformLocation(shaderProgram, "objectColor");
-
-    GLuint viewLoc = glGetUniformLocation(shaderProgram, "view");
+    int locRotation = glGetUniformLocation(shaderProgram, "rotation");
+    int locProj = glGetUniformLocation(shaderProgram, "proj");
 
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
 
     float rotationAngle = 0.0f;
-    vec3 rotationAxis = {0.0f, 1.0f, 1.0f};
+    vec3 rotationAxis = {1.0f, 1.0f, 1.0f};
+
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
 
     while (!glfwWindowShouldClose(window)) {
+
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
         rotationAngle += 1.0f * deltaTime;
 
-        mat4 rotationMatrix;
+        mat4 rotationMatrix, projection;
         glm_rotate_make(rotationMatrix, rotationAngle, rotationAxis);
 
-        vec3 newCameraPos;
-        mat4 view;
-        glm_vec3_scale(camera.front, 0.0f, newCameraPos);
-        glm_vec3_add(camera.position, newCameraPos, newCameraPos);
-        glm_lookat(newCameraPos, newCameraPos, camera.up, view);
+        glUniformMatrix4fv(locRotation, 1, GL_FALSE, (float*)rotationMatrix);
 
-        mat4 modelView;
-        mat4 projection;
-
-        glm_mat4_identity(modelView);
-        glm_mul(view, rotationMatrix, modelView);
-
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, (float*)view);
-
+        glfwGetFramebufferSize(window, &width, &height);
         float fov = glm_rad(45.0f);
-        float aspect = (float)640 / (float)480;
+        float aspect = (float)width / (float)height;
         float near = 0.1f;
         float far = 100.0f;
         glm_perspective(fov, aspect, near, far, projection);
+        glUniformMatrix4fv(locProj, 1, GL_FALSE, (float*)projection);
 
-        glUniformMatrix4fv(modelViewLoc, 1, GL_FALSE, (float*)modelView);
-        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, (float*)projection);
+        vec4 v = {100.0f, 200.0f, 300.0f, 1.0f};
+        vec4 c;
 
-        glUniform3f(lightPosLoc, 1.0f, 2.0f, 0.0f);
-        glUniform3f(viewPosLoc, 0.0f, 0.0f, 3.0f);
-        glUniform3f(lightColorLoc, 0.0f, 0.0f, 1.0f);
-        glUniform3f(objectColorLoc, 1.0f, 0.5f, 0.5f);
+        glm_mat4_mulv(projection, v, c);
 
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
+        printf("c: (%f, %f, %f)\r", c[0], c[1], c[2]);
+
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         int size = sizeof(cubeTriangles) / sizeof(Triangle);
         draw_mesh(cubeTriangles, size);
-
-        updateCamera(&camera, window, deltaTime, 0.05f);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
