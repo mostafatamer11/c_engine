@@ -1,1 +1,0 @@
-gcc -o res\Game.exe *.c res\glad.c -lopengl32 res\glfw3.dll -Iinclude
