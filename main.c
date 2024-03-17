@@ -107,13 +107,6 @@ int main(int argc, char* argv[]) {
         glm_perspective(fov, aspect, near, far, projection);
         glUniformMatrix4fv(locProj, 1, GL_FALSE, (float*)projection);
 
-        vec4 v = {100.0f, 200.0f, 300.0f, 1.0f};
-        vec4 c;
-
-        glm_mat4_mulv(projection, v, c);
-
-        printf("c: (%f, %f, %f)\r", c[0], c[1], c[2]);
-
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
