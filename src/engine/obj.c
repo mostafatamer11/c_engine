@@ -24,14 +24,12 @@ void loadOBJ(const char* filePath, Vertex** verts, int* vertLen, Triangle** tris
         exit(1);
     }
 
-    // Temporary buffers for vertices, texture coords, and normals
     float temp_vertices[MAX_VERTICES][3];
     float temp_texcoords[MAX_VERTICES][2];
     float temp_normals[MAX_VERTICES][3];
 
     int vertex_count = 0, texcoord_count = 0, normal_count = 0;
     int triangle_count = 0;
-
     char line[128];
 
     // First pass to count vertices and faces
@@ -48,9 +46,11 @@ void loadOBJ(const char* filePath, Vertex** verts, int* vertLen, Triangle** tris
     }
 
     // Allocate memory based on counts
-    *verts = (Vertex*)malloc(sizeof(Vertex) * vertex_count);
+    size_t vertex_array_size = vertex_count * 2;
+    Vertex* vertexList = (Vertex*)malloc(sizeof(Vertex) * vertex_array_size);
     *tris = (Triangle*)malloc(sizeof(Triangle) * triangle_count);
-    if (!(*verts) || !(*tris)) {
+
+    if (!vertexList || !(*tris)) {
         printf("Error: Memory allocation failed\n");
         exit(1);
     }
@@ -58,6 +58,7 @@ void loadOBJ(const char* filePath, Vertex** verts, int* vertLen, Triangle** tris
     // Reset file pointer to the beginning and reset counts
     rewind(file);
     vertex_count = texcoord_count = normal_count = 0;
+    int vert_index = 0;
     triangle_count = 0;
 
     // Second pass to populate vertex and triangle data
@@ -77,45 +78,46 @@ void loadOBJ(const char* filePath, Vertex** verts, int* vertLen, Triangle** tris
                                  &v_idx[0], &vt_idx[0], &vn_idx[0],
                                  &v_idx[1], &vt_idx[1], &vn_idx[1],
                                  &v_idx[2], &vt_idx[2], &vn_idx[2]);
-
             if (matches == 9) {
                 for (int i = 0; i < 3; i++) {
-                    Vertex vertex;
-                    vertex.pos[0] = temp_vertices[v_idx[i] - 1][0];
-                    vertex.pos[1] = temp_vertices[v_idx[i] - 1][1];
-                    vertex.pos[2] = temp_vertices[v_idx[i] - 1][2];
-
-                    if (vt_idx[i] > 0 && texcoord_count > 0) {
-                        vertex.texcoord[0] = temp_texcoords[vt_idx[i] - 1][0];
-                        vertex.texcoord[1] = temp_texcoords[vt_idx[i] - 1][1];
+                    Vertex vert;
+                    vert.pos[0] = temp_vertices[v_idx[i] - 1][0];
+                    vert.pos[1] = temp_vertices[v_idx[i] - 1][1];
+                    vert.pos[2] = temp_vertices[v_idx[i] - 1][2];
+                    if (vt_idx[i] > 0) {
+                        vert.texcoord[0] = temp_texcoords[vt_idx[i] - 1][0];
+                        vert.texcoord[1] = temp_texcoords[vt_idx[i] - 1][1];
                     } else {
-                        vertex.texcoord[0] = vertex.texcoord[1] = 0.0f;  // Default value
+                        vert.texcoord[0] = vert.texcoord[1] = 0.0f;
                     }
-
-                    if (vn_idx[i] > 0 && normal_count > 0) {
-                        vertex.normal[0] = temp_normals[vn_idx[i] - 1][0];
-                        vertex.normal[1] = temp_normals[vn_idx[i] - 1][1];
-                        vertex.normal[2] = temp_normals[vn_idx[i] - 1][2];
-                        vertex.type = VERTEX_NORMAL_TEXCOORD;
-                    } else {
-                        vertex.type = VERTEX_PLAIN;
+                    if (vn_idx[i] > 0) {
+                        vert.normal[0] = temp_normals[vn_idx[i] - 1][0];
+                        vert.normal[1] = temp_normals[vn_idx[i] - 1][1];
+                        vert.normal[2] = temp_normals[vn_idx[i] - 1][2];
                     }
+					vert.type == VERTEX_NORMAL_TEXCOORD;
+                    vertexList[vert_index++] = vert;
 
-                    (*verts)[v_idx[i] - 1] = vertex;  // Assign vertex
+                    if (vert_index >= vertex_array_size) {
+                        vertex_array_size *= 2;
+                        vertexList = (Vertex*)realloc(vertexList, sizeof(Vertex) * vertex_array_size);
+                        if (!vertexList) {
+                            printf("Error: Memory allocation failed\n");
+                            exit(1);
+                        }
+                    }
                 }
+                Triangle tri = { .indices = { vert_index - 3, vert_index - 2, vert_index - 1 } };
+                (*tris)[triangle_count++] = tri;
             }
-
-            Triangle triangle = {
-                .indices = { v_idx[0] - 1, v_idx[1] - 1, v_idx[2] - 1 }
-            };
-            (*tris)[triangle_count++] = triangle;  // Add triangle
         }
     }
 
     fclose(file);
 
-    // Set the counts after processing
-    *vertLen = vertex_count;
+    *vertLen = vert_index;
+    *verts = (Vertex*)realloc(vertexList, sizeof(Vertex) * vert_index); // Resize to actual size
     *triLen = triangle_count;
 }
+
 

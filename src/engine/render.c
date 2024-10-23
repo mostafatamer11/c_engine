@@ -52,16 +52,15 @@ void initOBJ(Vertex *vertices, Triangle *indices, size_t vertexCount, size_t ind
     glEnableVertexAttribArray(0);
 
     // Normal attribute (location = 1) - check if VertexType allows normals
-    if (vertices[0].type == VERTEX_NORMAL_TEXCOORD) {
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-        glEnableVertexAttribArray(1);
-    }
+	printf("SENDING THE DATA");
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    glEnableVertexAttribArray(1);
+	printf("SENT THE NORMALS");
 
     // Texcoord attribute (location = 2) - if the VertexType has texture coordinates
-    if (vertices[0].type == VERTEX_NORMAL_TEXCOORD) {
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texcoord));
-        glEnableVertexAttribArray(2);
-    }
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texcoord));
+    glEnableVertexAttribArray(2);
+	printf("SENT THE UV");
 
     // Step 4: Unbind the VAO (safe state)
     glBindVertexArray(0);
@@ -104,10 +103,10 @@ void renderOBJ(unsigned int *shaderProgram, unsigned int *VAO, Camera *camera, s
 	GLint objectColorLoc = glGetUniformLocation(*shaderProgram, "objectColor");
 	GLint useTextureLoc = glGetUniformLocation(*shaderProgram, "useTexture");
 
-	glUniform3f(lightPosLoc, 0.0f, 5.0f, 5.0f);        // Example light position
+	glUniform3f(lightPosLoc, 0.0f, 10.0f, 10.0f);        // Example light position
 	glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f);      // White light
 	glUniform3f(objectColorLoc, 1.0f, 1.0f, 0.31f);    // Example object color
-	glUniform1i(useTextureLoc, GL_FALSE);
+	glUniform1i(useTextureLoc, GL_TRUE);
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

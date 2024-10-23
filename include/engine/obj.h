@@ -1,7 +1,7 @@
 #ifndef OBJ_H
 #define OBJ_H
 
-#include "engine.h"
+#include "render.h"
 
 #define MAX_VERTICES 1024
 #define MAX_TRIANGLES 1024

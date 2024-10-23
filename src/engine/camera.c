@@ -52,8 +52,8 @@ void initCamera(Camera* camera, vec3 startPosition) {
 
     camera->yaw = -90.0f;  // Point along the negative Z-axis
     camera->pitch = 0.0f;
-    camera->movementSpeed = 2.5f;
-    camera->mouseSensitivity = 0.75f;
+    camera->movementSpeed = 5.0f;
+    camera->mouseSensitivity = 0.25f;
     camera->zoom = 45.0f;
     updateCameraVectors(camera);
 }

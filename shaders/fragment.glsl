@@ -16,7 +16,7 @@ uniform bool useTexture;    // Whether to use texture mapping
 void main()
 {
     // Ambient lighting (weak baseline lighting)
-    float ambientStrength = 0.1;
+    float ambientStrength = 0.25;
     vec3 ambient = ambientStrength * lightColor;
 
     // Diffuse lighting (directional lighting)
@@ -32,8 +32,7 @@ void main()
     if (useTexture) {
         // Sample the texture at the provided coordinates
         vec4 texColor = texture(texture1, TexCoord);
-        FragColor = vec4(lighting, 1.0) * texColor;  // Apply lighting to texture color
-		FragColor = vec4(lighting * objectColor, 1.0);
+        FragColor = texColor * vec4(lighting, 1.0);  // Apply lighting to texture color
     } else {
         // Use objectColor if no texture is used
         FragColor = vec4(lighting * objectColor, 1.0); // Apply lighting to object color
