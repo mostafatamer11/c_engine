@@ -16,7 +16,6 @@ bool startsWith(const char* pre, const char* str) {
 	return strncmp(pre, str, strlen(pre)) == 0;
 }
 
-
 void loadOBJ(const char* filePath, Vertex** verts, int* vertLen, Triangle** tris, int* triLen) {
     FILE *file = fopen(filePath, "r");
     if (!file) {
@@ -61,6 +60,16 @@ void loadOBJ(const char* filePath, Vertex** verts, int* vertLen, Triangle** tris
     int vert_index = 0;
     triangle_count = 0;
 
+    // Helper function to check for duplicate vertices
+    int findDuplicateVertex(Vertex* vertexList, int vert_index, Vertex* vert) {
+        for (int i = 0; i < vert_index; i++) {
+            if (memcmp(&vertexList[i], vert, sizeof(Vertex)) == 0) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     // Second pass to populate vertex and triangle data
     while (fgets(line, sizeof(line), file)) {
         if (startsWith("v ", line)) {
@@ -95,20 +104,31 @@ void loadOBJ(const char* filePath, Vertex** verts, int* vertLen, Triangle** tris
                         vert.normal[1] = temp_normals[vn_idx[i] - 1][1];
                         vert.normal[2] = temp_normals[vn_idx[i] - 1][2];
                     }
-					vert.type == VERTEX_NORMAL_TEXCOORD;
-                    vertexList[vert_index++] = vert;
+                    vert.type = VERTEX_NORMAL_TEXCOORD;
 
-                    if (vert_index >= vertex_array_size) {
-                        vertex_array_size *= 2;
-                        vertexList = (Vertex*)realloc(vertexList, sizeof(Vertex) * vertex_array_size);
-                        if (!vertexList) {
-                            printf("Error: Memory allocation failed\n");
-                            exit(1);
+                    // Check if this vertex already exists
+                    int duplicateIndex = findDuplicateVertex(vertexList, vert_index, &vert);
+                    if (duplicateIndex >= 0) {
+                        // Use existing vertex if found
+                        (*tris)[triangle_count].indices[i] = duplicateIndex;
+                    } else {
+                        // Add new vertex if not found
+                        vertexList[vert_index] = vert;
+                        (*tris)[triangle_count].indices[i] = vert_index;
+                        vert_index++;
+
+                        // Resize if necessary
+                        if (vert_index >= vertex_array_size) {
+                            vertex_array_size *= 2;
+                            vertexList = (Vertex*)realloc(vertexList, sizeof(Vertex) * vertex_array_size);
+                            if (!vertexList) {
+                                printf("Error: Memory allocation failed\n");
+                                exit(1);
+                            }
                         }
                     }
                 }
-                Triangle tri = { .indices = { vert_index - 3, vert_index - 2, vert_index - 1 } };
-                (*tris)[triangle_count++] = tri;
+                triangle_count++;
             }
         }
     }
@@ -119,5 +139,4 @@ void loadOBJ(const char* filePath, Vertex** verts, int* vertLen, Triangle** tris
     *verts = (Vertex*)realloc(vertexList, sizeof(Vertex) * vert_index); // Resize to actual size
     *triLen = triangle_count;
 }
-
 

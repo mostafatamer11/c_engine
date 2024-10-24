@@ -52,15 +52,12 @@ void initOBJ(Vertex *vertices, Triangle *indices, size_t vertexCount, size_t ind
     glEnableVertexAttribArray(0);
 
     // Normal attribute (location = 1) - check if VertexType allows normals
-	printf("SENDING THE DATA");
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
     glEnableVertexAttribArray(1);
-	printf("SENT THE NORMALS");
 
     // Texcoord attribute (location = 2) - if the VertexType has texture coordinates
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texcoord));
     glEnableVertexAttribArray(2);
-	printf("SENT THE UV");
 
     // Step 4: Unbind the VAO (safe state)
     glBindVertexArray(0);

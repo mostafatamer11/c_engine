@@ -1,4 +1,3 @@
-/*#define STB_IMAGE_IMPLEMENTATION*/
 #include <engine.h>
 
 int main() {
@@ -17,7 +16,7 @@ int main() {
     Vertex *vertices = NULL;
     Triangle *tris = NULL;
     int vertexCount = 0, indexCount = 0;
-    loadOBJ("obj/obj.obj", &vertices, &vertexCount, &tris, &indexCount);
+    loadOBJ("obj/grass.obj", &vertices, &vertexCount, &tris, &indexCount);
 
     unsigned int shaderProgram;
     initShaders("shaders/vertex.glsl", "shaders/fragment.glsl", &shaderProgram);
