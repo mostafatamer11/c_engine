@@ -1,5 +1,4 @@
-#include "engine.h"
-#include <engine/geometry.h>
+#include "dream.h"
 
 
 void initVert(Vertex* vert, VertexType t, float* pos, float* col, float* normal, float* texcoord) {

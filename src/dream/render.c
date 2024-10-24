@@ -1,5 +1,4 @@
-#include "engine.h"
-#include <time.h>
+#include "dream.h"
 
 void initMesh(Vertex* vertices, Triangle* indices, size_t vertexCount, size_t indexCount, unsigned int *VBO, unsigned int *EBO, unsigned int *VAO) {
     glGenVertexArrays(1, VAO);
@@ -31,20 +30,20 @@ void initMesh(Vertex* vertices, Triangle* indices, size_t vertexCount, size_t in
     glEnable(GL_DEPTH_TEST);
 }
 
-void initOBJ(Vertex *vertices, Triangle *indices, size_t vertexCount, size_t indexCount, unsigned int *VBO, unsigned int *EBO, unsigned int *VAO) {
+void drmInitOBJ(Mesh* mesh) {
     // Generate and bind the Vertex Array Object (VAO)
-    glGenVertexArrays(1, VAO);
-    glBindVertexArray(*VAO);
+    glGenVertexArrays(1, &mesh->VAO);
+    glBindVertexArray(mesh->VAO);
 
     // Step 1: Create and bind the Vertex Buffer Object (VBO)
-    glGenBuffers(1, VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(Vertex), vertices, GL_STATIC_DRAW);
+    glGenBuffers(1, &mesh->VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
+    glBufferData(GL_ARRAY_BUFFER, mesh->vertsLen * sizeof(Vertex), mesh->verts, GL_STATIC_DRAW);
 
     // Step 2: Create and bind the Element Buffer Object (EBO)
-    glGenBuffers(1, EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+    glGenBuffers(1, &mesh->EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->trisLen * 3 * sizeof(unsigned int), mesh->tris, GL_STATIC_DRAW);
 
     // Step 3: Define the vertex attribute layout
     // Position attribute (location = 0)
@@ -66,7 +65,7 @@ void initOBJ(Vertex *vertices, Triangle *indices, size_t vertexCount, size_t ind
     glEnable(GL_DEPTH_TEST);
 }
 
-void renderOBJ(unsigned int *shaderProgram, unsigned int *VAO, Camera *camera, size_t indexCount) {
+void drmRenderOBJ(unsigned int *shaderProgram, Mesh* mesh, Camera *camera) {
     // Clear the screen and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -78,7 +77,7 @@ void renderOBJ(unsigned int *shaderProgram, unsigned int *VAO, Camera *camera, s
     mat4 view;
     mat4 projection;
     // Camera's view matrix
-    getViewMatrix(camera, view);
+    drmGetViewMatrix(camera, view);
 
     // Projection matrix
     glm_perspective(glm_rad(45.0f), 800.0f / 600.0f, 0.1f, 100.0f, projection);
@@ -94,7 +93,7 @@ void renderOBJ(unsigned int *shaderProgram, unsigned int *VAO, Camera *camera, s
     if (projLoc != -1) glUniformMatrix4fv(projLoc, 1, GL_FALSE, (const GLfloat*)projection);
 
     // Bind the VAO and draw the elements (triangles)
-    glBindVertexArray(*VAO);
+    glBindVertexArray(mesh->VAO);
 	GLint lightPosLoc = glGetUniformLocation(*shaderProgram, "lightPos");
 	GLint lightColorLoc = glGetUniformLocation(*shaderProgram, "lightColor");
 	GLint objectColorLoc = glGetUniformLocation(*shaderProgram, "objectColor");
@@ -104,7 +103,7 @@ void renderOBJ(unsigned int *shaderProgram, unsigned int *VAO, Camera *camera, s
 	glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f);      // White light
 	glUniform3f(objectColorLoc, 1.0f, 1.0f, 0.31f);    // Example object color
 	glUniform1i(useTextureLoc, GL_TRUE);
-    glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, mesh->trisLen * 3, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 

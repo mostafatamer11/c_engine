@@ -1,5 +1,5 @@
-#ifndef TEX_H
-#define TEX_H
+#ifndef DRM_TEX_H
+#define DRM_TEX_H
 
 
 typedef struct {

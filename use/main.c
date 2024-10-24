@@ -1,78 +1,61 @@
-#include <engine.h>
+#include <dream.h>
 
 int main() {
-    GLFWwindow* window;
-    initEng(&window);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    
-    stbi_set_flip_vertically_on_load(true);
+	DRMwindow* window;
+	drmInit(&window);
+	drmShowMouse(window, false);
 
-    Camera cam;
-    vec3 startPos = {0.0f, 0.0f, 5.0f};
-    initCamera(&cam, startPos);
-    glfwSetWindowUserPointer(window, &cam);
+	Camera cam;
+	vec3 startPos = {0.0f, 0.0f, 5.0f};
+	drmInitCamera(&cam, startPos);
+	glfwSetWindowUserPointer(window, &cam);
 
-    Vertex *vertices = NULL;
-    Triangle *tris = NULL;
-    int vertexCount = 0, indexCount = 0;
-    loadOBJ("obj/grass.obj", &vertices, &vertexCount, &tris, &indexCount);
+	Mesh cube;
+	drmLoadOBJ("obj/grass.obj", &cube);
+	drmInitOBJ(&cube);
 
-    unsigned int shaderProgram;
-    initShaders("shaders/vertex.glsl", "shaders/fragment.glsl", &shaderProgram);
+	unsigned int shaderProgram;
+	initShaders("shaders/vertex.glsl", "shaders/fragment.glsl", &shaderProgram);
 
-    unsigned int VBO, EBO, VAO;
-    initOBJ(vertices, tris, vertexCount, indexCount * 3, &VBO, &EBO, &VAO);
+	Texture tex;
+	unsigned int tex_id;
+	initTEX("assets/grass.jpg", &tex, &tex_id, &cube.VAO, &shaderProgram);
 
-    for (int i = 0; i < vertexCount; ++i) {
-        printf("Vertex %d: texcoord=(%f, %f), type=%d\n", i, vertices[i].texcoord[0], vertices[i].texcoord[1], vertices[i].type == VERTEX_NORMAL_TEXCOORD);
-    }
-    for (int i = 0; i < indexCount; ++i) {
-        printf("Triangle %d: indices=(%d, %d, %d)\n", i, tris[i].indices[0], tris[i].indices[1], tris[i].indices[2]);
-    }
+	float currentFrame, deltaTime = 0, lastFrame = 0;
 
-    Texture tex;
-    unsigned int tex_id;
-    initTEX("assets/grass.jpg", &tex, &tex_id, &VAO, &shaderProgram);
+	while (!glfwWindowShouldClose(window)) {
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+			glfwSetWindowShouldClose(window, GLFW_TRUE);
 
-    float currentFrame, deltaTime = 0, lastFrame = 0;
+		currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
 
-    while (!glfwWindowShouldClose(window)) {
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+		glUseProgram(shaderProgram);
+		glBindTexture(GL_TEXTURE_2D, tex_id);
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		drmProcessKeyboardInput(&cam, window, deltaTime);
+		drmRenderOBJ(&shaderProgram, &cube, &cam);
 
-        glUseProgram(shaderProgram);
-        glBindTexture(GL_TEXTURE_2D, tex_id);
+		glBindVertexArray(cube.VAO);
+		glDrawElements(GL_TRIANGLES, cube.trisLen * 3, GL_UNSIGNED_INT, 0);
 
-        processKeyboardInput(&cam, window, deltaTime);
-        renderOBJ(&shaderProgram, &VAO, &cam, indexCount * 3);
+		glBindVertexArray(0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, indexCount * 3, GL_UNSIGNED_INT, 0);
-
-        glBindVertexArray(0);
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+		glfwSwapBuffers(window);
+		glfwPollEvents();
 		GLenum err;
 		while((err = glGetError()) != GL_NO_ERROR) {
-			    printf("OpenGL error: %d\n", err);
+			printf("OpenGL error: %d\n", err);
 		}
+		printf("FPS: %f\r", 1/deltaTime);
 	}
-
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
-	glDeleteTextures(1, &tex_id);
-	freeOBJ(vertices, tris);
+	drmFreeOBJ(&cube);
 	glfwTerminate();
+	printf("\n");
 	return 0;
 }
 

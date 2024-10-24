@@ -1,5 +1,4 @@
-#include "engine.h"
-#include <stdio.h>
+#include "dream.h"
 
     
 void initShaders(const char* vertFile, const char* fragFile, unsigned int* shaderProgram) {

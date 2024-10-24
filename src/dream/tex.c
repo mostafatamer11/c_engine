@@ -1,4 +1,4 @@
-#include "engine.h"
+#include "dream.h"
 
 void initTEX(const char* filePath, Texture* tex, unsigned int* gl_tex, unsigned int* VAO, unsigned int* shader) {
     stbi_set_flip_vertically_on_load(true);

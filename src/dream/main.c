@@ -1,4 +1,5 @@
-#include "engine.h"
+#include "dream.h"
+#include <GLFW/glfw3.h>
 
 
 void readFile(const char* filename) {
@@ -25,7 +26,7 @@ void readFile(const char* filename) {
 
 
 
-int initEng(GLFWwindow **window) {
+int drmInit(GLFWwindow **window) {
     if (!glfwInit()) {
         printf("Failed to initialize GLFW\n");
         return -1;
@@ -49,9 +50,15 @@ int initEng(GLFWwindow **window) {
     }
 
     glEnable(GL_DEPTH_TEST); // Enable depth testing
+    glfwSetCursorPosCallback(*window, drmMouseCallback);
+    stbi_set_flip_vertically_on_load(true);
     return 0;
 }
 
+void drmShowMouse(DRMwindow* window, bool i) {
+	if (i) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	else glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
 
 void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
