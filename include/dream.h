@@ -10,9 +10,9 @@
 #include "dream/tex.h"
 #include "dream/obj.h"
 #include "dream/render.h"
-#include "dream/geometry.h"
 #include "dream/shader.h"
 #include "dream/camera.h"
+#include "dream/geometry.h"
 
 
 typedef GLFWwindow DRMwindow;

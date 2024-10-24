@@ -4,6 +4,7 @@
 #include "dream.h"
 
 
-void drmInitTEX(const char* filePath, Mesh* mesh, unsigned int* shader);
+
+void drmInitTEX(const char* filePath, Texture* tex, unsigned int* shader);
 
 #endif

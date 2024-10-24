@@ -6,7 +6,7 @@ void drmFreeOBJ(Mesh* mesh) {
 	glDeleteVertexArrays(1, &mesh->VAO);
 	glDeleteBuffers(1, &mesh->VBO);
 	glDeleteBuffers(1, &mesh->EBO);
-	glDeleteTextures(1, &mesh->TEX);
+	glDeleteTextures(1, &mesh->tex->TEX);
 	if (mesh->verts != NULL) free(mesh->verts);
 	if (mesh->tris != NULL) free(mesh->tris);
 }

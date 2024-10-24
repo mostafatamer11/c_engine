@@ -67,7 +67,6 @@ void drmInitOBJ(Mesh* mesh) {
 
 void drmRenderOBJ(unsigned int *shaderProgram, Mesh* mesh, Camera *camera) {
     // Clear the screen and depth buffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Use the shader program
     glUseProgram(*shaderProgram);
@@ -98,12 +97,14 @@ void drmRenderOBJ(unsigned int *shaderProgram, Mesh* mesh, Camera *camera) {
 	GLint lightColorLoc = glGetUniformLocation(*shaderProgram, "lightColor");
 	GLint objectColorLoc = glGetUniformLocation(*shaderProgram, "objectColor");
 	GLint useTextureLoc = glGetUniformLocation(*shaderProgram, "useTexture");
-	glBindTexture(GL_TEXTURE_2D, mesh->TEX);
+	glBindTexture(GL_TEXTURE_2D, mesh->tex->TEX);
+	GLint textureLoc = glGetUniformLocation(*shaderProgram, "texture1");
 
 	glUniform3f(lightPosLoc, 0.0f, 10.0f, 10.0f);        // Example light position
 	glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f);      // White light
 	glUniform3f(objectColorLoc, 1.0f, 1.0f, 0.31f);    // Example object color
 	glUniform1i(useTextureLoc, GL_TRUE);
+	glUniform1i(textureLoc, 0);
     glDrawElements(GL_TRIANGLES, mesh->trisLen * 3, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);

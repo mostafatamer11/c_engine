@@ -8,9 +8,11 @@ typedef enum {
     VERTEX_NORMAL_TEXCOORD
 } VertexType;
 
+
 typedef struct {
 	int width, height, colNum;
 	unsigned char* bytes;
+	unsigned int TEX;
 } Texture;
 
 typedef struct {
@@ -37,8 +39,8 @@ typedef struct {
 	size_t trisLen;
 	Vertex* verts;
 	Triangle* tris;
-	unsigned int VBO, VAO, EBO, TEX;
-	Texture tex;
+	unsigned int VBO, VAO, EBO;
+	Texture* tex;
 } Mesh;
 
 
