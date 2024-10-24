@@ -7,8 +7,8 @@
 #include <stb_image.h>
 
 #include "dream/main.h"
-#include "dream/obj.h"
 #include "dream/tex.h"
+#include "dream/obj.h"
 #include "dream/render.h"
 #include "dream/geometry.h"
 #include "dream/shader.h"

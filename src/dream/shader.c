@@ -1,7 +1,7 @@
 #include "dream.h"
 
     
-void initShaders(const char* vertFile, const char* fragFile, unsigned int* shaderProgram) {
+void drmInitShaders(const char* vertFile, const char* fragFile, unsigned int* shaderProgram) {
     // Open vertex and fragment shader files
     FILE* vertFileObj = fopen(vertFile, "r");
     FILE* fragFileObj = fopen(fragFile, "r");

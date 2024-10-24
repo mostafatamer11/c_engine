@@ -98,6 +98,7 @@ void drmRenderOBJ(unsigned int *shaderProgram, Mesh* mesh, Camera *camera) {
 	GLint lightColorLoc = glGetUniformLocation(*shaderProgram, "lightColor");
 	GLint objectColorLoc = glGetUniformLocation(*shaderProgram, "objectColor");
 	GLint useTextureLoc = glGetUniformLocation(*shaderProgram, "useTexture");
+	glBindTexture(GL_TEXTURE_2D, mesh->TEX);
 
 	glUniform3f(lightPosLoc, 0.0f, 10.0f, 10.0f);        // Example light position
 	glUniform3f(lightColorLoc, 1.0f, 1.0f, 1.0f);      // White light
@@ -105,6 +106,7 @@ void drmRenderOBJ(unsigned int *shaderProgram, Mesh* mesh, Camera *camera) {
 	glUniform1i(useTextureLoc, GL_TRUE);
     glDrawElements(GL_TRIANGLES, mesh->trisLen * 3, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 

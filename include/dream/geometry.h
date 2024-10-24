@@ -9,6 +9,11 @@ typedef enum {
 } VertexType;
 
 typedef struct {
+	int width, height, colNum;
+	unsigned char* bytes;
+} Texture;
+
+typedef struct {
 	float pos[3];
 	union {
 		struct {
@@ -33,6 +38,7 @@ typedef struct {
 	Vertex* verts;
 	Triangle* tris;
 	unsigned int VBO, VAO, EBO, TEX;
+	Texture tex;
 } Mesh;
 
 

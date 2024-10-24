@@ -15,11 +15,8 @@ int main() {
 	drmInitOBJ(&cube);
 
 	unsigned int shaderProgram;
-	initShaders("shaders/vertex.glsl", "shaders/fragment.glsl", &shaderProgram);
-
-	Texture tex;
-	unsigned int tex_id;
-	initTEX("assets/grass.jpg", &tex, &tex_id, &cube.VAO, &shaderProgram);
+	drmInitShaders("shaders/vertex.glsl", "shaders/fragment.glsl", &shaderProgram);
+	drmInitTEX("assets/grass.jpg", &cube, &shaderProgram);
 
 	float currentFrame, deltaTime = 0, lastFrame = 0;
 
@@ -33,17 +30,8 @@ int main() {
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glUseProgram(shaderProgram);
-		glBindTexture(GL_TEXTURE_2D, tex_id);
-
 		drmProcessKeyboardInput(&cam, window, deltaTime);
 		drmRenderOBJ(&shaderProgram, &cube, &cam);
-
-		glBindVertexArray(cube.VAO);
-		glDrawElements(GL_TRIANGLES, cube.trisLen * 3, GL_UNSIGNED_INT, 0);
-
-		glBindVertexArray(0);
-		glBindTexture(GL_TEXTURE_2D, 0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -51,11 +39,9 @@ int main() {
 		while((err = glGetError()) != GL_NO_ERROR) {
 			printf("OpenGL error: %d\n", err);
 		}
-		printf("FPS: %f\r", 1/deltaTime);
 	}
 	drmFreeOBJ(&cube);
 	glfwTerminate();
-	printf("\n");
 	return 0;
 }
 
